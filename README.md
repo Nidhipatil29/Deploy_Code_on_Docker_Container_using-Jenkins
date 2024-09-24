@@ -2,10 +2,10 @@
 
 ![AWS](https://imgur.com/Hk28ffE.png)
 
-**In this blog, we are going to deploy a Java Web app on a Docker Container built on an EC2 Instance through the use of Jenkins.**
+** We are going to deploy a Java Web app on a Docker Container built on an EC2 Instance through the use of Jenkins.**
 
 ### Agenda
-
+* First Download The Zip File or Clone this Git Repository
 * Setup Jenkins
 * Setup & Configure Maven and Git
 * Integrating GitHub and Maven with Jenkins
