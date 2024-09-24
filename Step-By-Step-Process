@@ -1,0 +1,122 @@
+To deploy your Java web application in a Docker container using Jenkins on an AWS EC2 instance, follow this step-by-step guide:
+
+---
+
+## **Step-by-Step Deployment Process**
+
+### **Step 1: Set Up Jenkins on EC2**
+1. **Create an EC2 instance** using the AWS Management Console.
+   - Launch a **t2.micro** instance (free tier) with Amazon Linux.
+   - Allow **SSH** and **port 8080** in the security group for Jenkins access.
+   
+2. **Install Java and Jenkins** on the instance:
+   - Install **Java 11**:  
+     ```bash
+     sudo yum install java-11-openjdk-devel
+     ```
+   - Install **Jenkins**:  
+     ```bash
+     sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+     sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+     sudo yum install jenkins
+     sudo systemctl start jenkins
+     sudo systemctl enable jenkins
+     ```
+   - Access Jenkins via the instance’s public IP on port `8080`.
+   - Unlock Jenkins using the **initial admin password** found at:
+     ```bash
+     /var/lib/jenkins/secrets/initialAdminPassword
+     ```
+
+### **Step 2: Integrate GitHub with Jenkins**
+1. **Install Git on the EC2 instance**:
+   ```bash
+   sudo yum install git
+   ```
+2. **Install the GitHub plugin** in Jenkins:
+   - Navigate to **Manage Jenkins > Manage Plugins**.
+   - Search for **GitHub plugin** and install it.
+
+3. **Configure Git in Jenkins**:
+   - Go to **Manage Jenkins > Global Tool Configuration**.
+   - Add **Git installation**, then click "Save."
+
+### **Step 3: Set Up Maven in Jenkins**
+1. **Install Maven on the EC2 instance**:
+   - Download and extract Maven:
+     ```bash
+     cd /opt
+     sudo wget https://mirrors.sonic.net/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
+     sudo tar -xzvf apache-maven-3.8.1-bin.tar.gz
+     ```
+   - Set up **Maven environment variables**:
+     ```bash
+     vi ~/.bash_profile
+     export M2_HOME=/opt/apache-maven-3.8.1
+     export PATH=$M2_HOME/bin:$PATH
+     source ~/.bash_profile
+     ```
+
+2. **Install Maven plugin in Jenkins**:
+   - Go to **Manage Jenkins > Manage Plugins**, search for the **Maven Integration Plugin**, and install it.
+   - Configure Maven under **Global Tool Configuration**, and provide the Maven installation path.
+
+### **Step 4: Set Up Docker Host on EC2**
+1. **Install Docker** on the EC2 instance:
+   ```bash
+   sudo yum install docker
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   sudo usermod -aG docker ec2-user
+   ```
+   - Verify Docker installation:
+     ```bash
+     docker --version
+     ```
+
+2. **Run a Tomcat Docker container**:
+   - Pull the **Tomcat Docker image**:
+     ```bash
+     docker pull tomcat
+     ```
+   - Run the container:
+     ```bash
+     docker run -d -p 8080:8080 tomcat
+     ```
+
+### **Step 5: Automate Build and Deployment with Jenkins**
+1. **Create a Jenkins Pipeline**:
+   - Navigate to **Jenkins > New Item** and select **Pipeline**.
+   - Configure **Pipeline script**:
+     ```groovy
+     pipeline {
+         agent any
+         stages {
+             stage('Clone repository') {
+                 steps {
+                     git 'https://github.com/your-repository-url.git'
+                 }
+             }
+             stage('Build Maven Project') {
+                 steps {
+                     sh 'mvn clean package'
+                 }
+             }
+             stage('Build Docker Image') {
+                 steps {
+                     sh 'docker build -t myapp .'
+                 }
+             }
+             stage('Deploy to Docker') {
+                 steps {
+                     sh 'docker run -d -p 8080:8080 myapp'
+                 }
+             }
+         }
+     }
+     ```
+
+### **Step 6: Test the Deployment**
+### Once the Jenkins pipeline completes successfully, you can access the deployed Java web app via the **public IP of the Docker container on port 8080**.
+
+---
