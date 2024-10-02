@@ -4,7 +4,10 @@
          stages {
              stage('Clone repository') {
                  steps {
-                     git 'https://github.com/Nidhipatil29/Deploy_Code_on_Docker_Container_using-Jenkins.git'
+                       git branch : 'main' , url:'https://github.com/Nidhipatil29/Deploy_Code_on_Docker_Container_using-Jenkins.git'
+
+                       sh 'ls -a'
+
                  }
              }
              
