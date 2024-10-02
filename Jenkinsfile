@@ -13,12 +13,12 @@
              
              stage('Build Docker Image') {
                  steps {
-                     sh 'docker build -t myapp .'
+                     sh 'docker build -t mywebapp .'
                  }
              }
              stage('Deploy to Docker') {
                  steps {
-                     sh 'docker run -d -p 8080:8080 myapp'
+                     sh 'docker run -d -p 8081:8080 mywebapp'
                  }
              }
          }
