@@ -10,13 +10,20 @@
 
                  }
              }
-             
-             stage('Build Docker Image') {
+               
+              stage('Build Maven Project') {
+                 steps {
+                     sh 'mvn clean package'
+                 }
+             }
+           
+              
+              stage('Build Docker Image') {
                  steps {
                      sh 'docker build -t mywebapp:v1 .'
                  }
              }
-             stage('Deploy to Docker') {
+              stage('Deploy to Docker') {
                  steps {
                      sh 'docker run -d -p 8082:8082 mywebapp:v1'
                  }
