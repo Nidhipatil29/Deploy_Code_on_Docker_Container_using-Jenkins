@@ -18,7 +18,7 @@
              }
              stage('Deploy to Docker') {
                  steps {
-                     sh 'docker run -d -p 8081:8080 mywebapp'
+                     sh 'docker run -d -p 8081:8081 mywebapp'
                  }
              }
          }
